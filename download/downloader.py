@@ -23,4 +23,4 @@ def fetch(url, filename, data_dir):
 
 if __name__ == "__main__":
     for url, filename in URLS.items():
-        fetch(url, filename)
+        fetch(url, filename, data_dir=DATA_DIR)

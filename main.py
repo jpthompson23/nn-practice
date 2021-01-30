@@ -39,13 +39,15 @@ def train(model, X_train, Y_train):
         losses.append(loss)
         accuracies.append(accuracy)
         trng.set_description(f"loss: {loss:.2f} / accuracy: {accuracy:.2f} / progress")
-    plt.ylim(-0.1, 1.1)
-    plt.plot(losses)
-    plt.plot(accuracies)
+    # plt.ylim(-0.1, 1.1)
+    # plt.plot(losses)
+    # plt.plot(accuracies)
+    # plt.show()
 
 
 def main():
     from torchnet import MyNet
+    from npnet import NpNet
 
     model = MyNet()
     X_train = load("x-train.gz")[0x10:].reshape(-1, 28*28)
@@ -60,10 +62,16 @@ def main():
         model(torch.tensor(X_test.reshape(-1, 28 * 28)).float()),
         dim=1
     ).numpy()
-    test_acc = (Y_test == Y_pred).mean()
-    print(f"test accuracy: {test_acc}")
+    test1_acc = np.equal(Y_test, Y_pred).mean()
+    print(f"test1 accuracy: {test1_acc}")
 
-    return model
+    model2 = NpNet(
+        model.l1.weight.detach().numpy().transpose(),
+        model.l2.weight.detach().numpy().transpose()
+    )
+    Y_pred2 = model2.predict(X_test)
+    test2_acc = np.equal(Y_test, Y_pred2).mean()
+    print(f"test2 accuracy: {test2_acc}")
 
 
 if __name__ == '__main__':
