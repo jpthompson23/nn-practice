@@ -19,5 +19,11 @@ class NpNet(object):
         return x
 
     def predict(self, x: np.ndarray):
-        y_test_preds = np.argmax(self.forward(x.reshape(-1, 28*28)), axis=1)
+        y_test_preds = self.forward(x.reshape(-1, 28*28))
         return y_test_preds
+
+    def loss(self, samp, y_preds, y_test):
+        # print("y_test for samp: ", y_test[samp])
+        # for i in samp:
+        #     print(y_test[i], np.argmax(y_preds[i]), y_preds[i], y_preds[i][np.argmax(y_preds[i])])
+        return -y_preds[samp, y_test[samp]] + np.log(np.exp(y_preds[samp]).sum(axis=1))

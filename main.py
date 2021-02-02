@@ -69,9 +69,13 @@ def main():
         model.l1.weight.detach().numpy().transpose(),
         model.l2.weight.detach().numpy().transpose()
     )
-    Y_pred2 = model2.predict(X_test)
-    test2_acc = np.equal(Y_test, Y_pred2).mean()
+    Y_preds2 = model2.predict(X_test)
+    test2_acc = np.equal(Y_test, np.argmax(Y_preds2, axis=1)).mean()
     print(f"test2 accuracy: {test2_acc}")
+
+    samp = range(0, 10)
+    losses = model2.loss(samp, Y_preds2, Y_test)
+    print(losses)
 
 
 if __name__ == '__main__':
