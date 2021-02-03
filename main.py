@@ -73,9 +73,15 @@ def main():
     test2_acc = np.equal(Y_test, np.argmax(Y_preds2, axis=1)).mean()
     print(f"test2 accuracy: {test2_acc}")
 
-    samp = range(0, 10)
-    losses = model2.loss(samp, Y_preds2, Y_test)
-    print(losses)
+    # print scores:
+    #print(np.array([Y_preds2[i, Y_test[i]] for i in range(Y_preds2.shape[0])]))
+
+    # samp = range(0, 10)
+    losses = model2.loss(Y_preds2, Y_test)
+    max_loss = np.argmax(losses)
+    plt.imshow(X_test[max_loss].reshape(28, 28))
+    print("worst image: ", Y_test[max_loss])
+    plt.show()
 
 
 if __name__ == '__main__':

@@ -22,8 +22,16 @@ class NpNet(object):
         y_test_preds = self.forward(x.reshape(-1, 28*28))
         return y_test_preds
 
-    def loss(self, samp, y_preds, y_test):
-        # print("y_test for samp: ", y_test[samp])
-        # for i in samp:
-        #     print(y_test[i], np.argmax(y_preds[i]), y_preds[i], y_preds[i][np.argmax(y_preds[i])])
-        return -y_preds[samp, y_test[samp]] + np.log(np.exp(y_preds[samp]).sum(axis=1))
+    def loss(self, y_preds: np.ndarray, y_test: np.ndarray):
+        print("y_preds.shape: ", y_preds.shape)
+        print("y_preds: ", y_preds)
+
+        print("y_test.shape", y_test.shape)
+        print("y_test: ", y_test)
+
+        y_test_reshaped = y_test.reshape((y_test.shape[0], 1))
+        print("y_test_reshaped: ", y_test_reshaped)
+        scores = np.take_along_axis(y_preds, y_test_reshaped, axis=1)
+        scores = scores.reshape(y_test.shape)
+        print("scores: ", scores)
+        return -scores + np.log(np.exp(y_preds).sum(axis=1))
