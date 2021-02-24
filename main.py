@@ -4,7 +4,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 from tqdm import trange
+from operator import itemgetter
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
 
 DATA_DIR = "./download/data"
 
@@ -45,7 +47,7 @@ def train(model, X_train, Y_train):
     # plt.show()
 
 
-def main():
+class Main(object):
     from torchnet import MyNet
     from npnet import NpNet
 
@@ -66,23 +68,53 @@ def main():
     print(f"test1 accuracy: {test1_acc}")
 
     model2 = NpNet(
-        model.l1.weight.detach().numpy().transpose(),
-        model.l2.weight.detach().numpy().transpose()
+        model.l1.weight.detach().numpy().T,
+        model.l2.weight.detach().numpy().T
     )
     Y_preds2 = model2.predict(X_test)
     test2_acc = np.equal(Y_test, np.argmax(Y_preds2, axis=1)).mean()
     print(f"test2 accuracy: {test2_acc}")
 
     # print scores:
-    #print(np.array([Y_preds2[i, Y_test[i]] for i in range(Y_preds2.shape[0])]))
+    # print(np.array([Y_preds2[i, Y_test[i]] for i in range(Y_preds2.shape[0])]))
 
     # samp = range(0, 10)
     losses = model2.loss(Y_preds2, Y_test)
-    max_loss = np.argmax(losses)
-    plt.imshow(X_test[max_loss].reshape(28, 28))
-    print("worst image: ", Y_test[max_loss])
-    plt.show()
+
+    # max_loss = np.argmax(losses)
+    # plt.imshow(X_test[max_loss].reshape(28, 28))
+    # print("worst image: ", Y_test[max_loss])
+    # plt.show()
+
+    @classmethod
+    def show_test_image(cls, i):
+        plt.imshow(cls.X_test[i].reshape(28, 28))
+
+    @classmethod
+    def X_grid(cls, n, m, reverse=False):
+        zipped_losses = sorted(
+            list(zip(
+                range(cls.losses.shape[0]),
+                cls.losses,
+                np.argmax(cls.Y_preds2, axis=1),
+                cls.Y_test)
+            ),
+            key=itemgetter(1),
+            reverse=reverse)
+
+        grid_Xs = zipped_losses[:n * m]
+        grid_img_Xs_flat = cls.X_test[[X[0] for X in grid_Xs]]
+        grid_img_Xs_3 = grid_img_Xs_flat.reshape(m, n*28, 28)
+        print("grid_img_Xs_flat shape : ", grid_img_Xs_flat.shape)
+        grid_img_Xs_seq = tuple(grid_img_Xs_3[i] for i in range(m))
+        grid_img_Xs = np.concatenate(grid_img_Xs_seq, axis=1)
+
+        print("grid_img_Xs shape: ", grid_img_Xs.shape)
+        plt.imshow(grid_img_Xs)
+
+        plt.show()
 
 
 if __name__ == '__main__':
-    main()
+    main = Main()
+    main.X_grid(5, 5)
